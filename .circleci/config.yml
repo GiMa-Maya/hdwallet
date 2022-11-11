@@ -79,5 +79,6 @@ workflows:
           filters:
             branches:
               only:
+                - develop
                 - master
                 - v1-legacy
