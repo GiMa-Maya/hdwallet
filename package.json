@@ -1,9 +1,9 @@
 {
   "name": "@keepkey/hdwallet",
   "private": true,
-  "repository": "https://github.com/shapeshift/hdwallet",
-  "author": "ShapeShift Open Source <oss@keepkey.io>",
-  "license": "MIT",
+  "repository": "https://github.com/keepkey/hdwallet",
+  "author": "KeepKey Open Source <highlander@keepkey.com>",
+  "license": "GNU",
   "workspaces": {
     "packages": [
       "packages/*",
@@ -54,6 +54,7 @@
     "typescript": "^4.3.2"
   },
   "dependencies": {
+    "@types/prettier": "^2.7.1",
     "patch-package": "^6.2.2",
     "postinstall-postinstall": "^2.1.0"
   }

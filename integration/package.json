@@ -19,6 +19,7 @@
     "@shapeshiftoss/hdwallet-portis": "1.38.0",
     "@shapeshiftoss/hdwallet-trezor": "1.38.0",
     "@shapeshiftoss/hdwallet-xdefi": "1.38.0",
+    "@types/inquirer": "^9.0.3",
     "@types/jest": "^26.0.23",
     "fast-json-stable-stringify": "^2.1.0",
     "jest": "^26.6.3",
