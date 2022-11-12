@@ -88,6 +88,6 @@ export abstract class LedgerTransport extends core.Transport {
   public abstract call<T extends LedgerTransportCoinType, U extends LedgerTransportMethodName<T>>(
     coin: T,
     method: U,
-    ...args: Parameters<LedgerTransportMethod<T, U>>
+    ...args: any
   ): Promise<LedgerResponse<T, U>>;
 }

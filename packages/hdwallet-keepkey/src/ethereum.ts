@@ -5,6 +5,7 @@ import * as Messages from "@keepkey/device-protocol/lib/messages_pb";
 import * as Ethereum from "@keepkey/device-protocol/lib/messages-ethereum_pb";
 import * as Types from "@keepkey/device-protocol/lib/types_pb";
 import * as core from "@keepkey/hdwallet-core";
+import { getMessage, getTypeHash, TypedData } from "eip-712";
 import * as eip55 from "eip55";
 import * as ethers from "ethers";
 

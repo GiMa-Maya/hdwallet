@@ -184,6 +184,7 @@ const _signatureStatic = {
     const msgOrDigest =
       digestAlgorithm === null
         ? checkType(ByteArray(32), message)
+          // @ts-ignore
         : Digest.Algorithms[digestAlgorithm](checkType(ByteArray(), message));
     return tinyecc.verify(Buffer.from(msgOrDigest), Buffer.from(publicKey), Buffer.from(x));
   },
@@ -290,6 +291,7 @@ const _recoverableSignatureStatic = {
     const msgOrDigest =
       digestAlgorithm === null
         ? checkType(ByteArray(32), message)
+        // @ts-ignore
         : Digest.Algorithms[digestAlgorithm](checkType(ByteArray(), message));
     const sig = RecoverableSignature.sig(x);
     const recoveryParam = RecoverableSignature.recoveryParam(x);

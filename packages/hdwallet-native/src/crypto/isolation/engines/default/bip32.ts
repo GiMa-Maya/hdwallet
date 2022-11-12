@@ -86,6 +86,7 @@ export class Node extends Revocable(class {}) implements BIP32.Node, SecP256K1.E
     const msgOrDigest =
       digestAlgorithm === null
         ? checkType(ByteArray(32), msg)
+        // @ts-ignore
         : Digest.Algorithms[digestAlgorithm](checkType(ByteArray(), msg));
     const entropy = counter === undefined ? undefined : Buffer.alloc(32);
     entropy?.writeUInt32BE(counter ?? 0, 24);
@@ -150,6 +151,7 @@ export class Node extends Revocable(class {}) implements BIP32.Node, SecP256K1.E
     if (digestAlgorithm === null) return sharedFieldElement;
 
     let out = SecP256K1.CurvePoint.x(sharedFieldElement);
+    // @ts-ignore
     if (digestAlgorithm !== undefined) out = Digest.Algorithms[digestAlgorithm](out);
     return out;
   }

@@ -10,12 +10,17 @@ import { _initializeAlgorithms, AlgorithmLength } from "./algorithms";
 // we can assert the type even though it can't be inferred.
 function algorithmNameBase<L extends NonNegativeInteger | undefined = undefined>(
   length?: L
+  // @ts-ignore
 ): Enum<{ [N in AlgorithmName<L>]: N }> {
   return Enum(
     `AlgorithmName(${length ?? ""})`,
+      // @ts-ignore
     Object.entries(AlgorithmLength)
+        // @ts-ignore
       .filter((x) => length === undefined || length === x[1])
+        // @ts-ignore
       .map((x) => x[0])
+        // @ts-ignore
       .reduce((a, x) => Object.assign(a, { [x]: x }), {})
   ) as any;
 }
@@ -31,6 +36,7 @@ export type AlgorithmName<L extends NonNegativeInteger | undefined = undefined> 
   : algorithmNameInner<keyof typeof AlgorithmLength, L>;
 const algorithmNameStatic = {
   forEach(callbackfn: (value: AlgorithmName, index: number, array: AlgorithmName[]) => void, thisarg?: any) {
+    // @ts-ignore
     (Object.keys(AlgorithmName().enumObject) as AlgorithmName[]).forEach(callbackfn, thisarg);
   },
 };
@@ -40,6 +46,7 @@ export const AlgorithmName: typeof algorithmName = algorithmName;
 function specificUnverifiedDigest<N extends AlgorithmName = AlgorithmName>(name: N): Runtype<UnverifiedDigest<N>> {
   return Obj({
     preimage: ByteArray(),
+    // @ts-ignore
     algorithm: Literal(name),
   }).And(ByteArray(AlgorithmLength[name])) as any;
 }
@@ -83,8 +90,11 @@ export const Algorithms = (() => {
 
   _initializeAlgorithms(<N extends AlgorithmName>(name: N, fn: Algorithm<N>) => {
     AlgorithmName.assert(name);
-    if (name in algorithms) throw new Error(`digest algorithm implementation already provided for ${name}`);
+    if (name in algorithms) { // @ts-ignore
+      throw new Error(`digest algorithm implementation already provided for ${name}`);
+    }
     algorithms[name] = Algorithm(name).enforce((x: ByteArray) => {
+      // @ts-ignore
       const out = checkType(ByteArray(AlgorithmLength[name]), fn(x)) as Partial<UnverifiedDigest<N>>;
       out.preimage = x;
       out.algorithm = name;
@@ -94,6 +104,7 @@ export const Algorithms = (() => {
 
   Object.freeze(algorithms);
   AlgorithmName.forEach((x) => {
+    // @ts-ignore
     if (!algorithms[x]) throw new Error(`digest algorithm implementation missing for ${x}`);
   });
 
@@ -101,10 +112,14 @@ export const Algorithms = (() => {
 })();
 
 function digestBase(name?: AlgorithmName) {
+  // @typescript-eslint/ban-ts-comment @ts-ignore
   return UnverifiedDigest(name).withConstraint(
     (x) =>
+      // @ts-ignore
       ByteArray.equal(x, Algorithms[x.algorithm](x.preimage)) ||
+      // @ts-ignore
       `expected ${x} to equal the ${x.algorithm} digest of ${x.preimage}`,
+    // @ts-ignore
     { name: `Digest(${name})` }
   );
 }
