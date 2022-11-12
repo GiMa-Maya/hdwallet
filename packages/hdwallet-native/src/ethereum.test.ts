@@ -33,18 +33,6 @@ describe("NativeETHWalletInfo", () => {
     ]);
   });
 
-  it("should return the correct account paths for other coin", async () => {
-    const paths = info.ethGetAccountPaths({ coin: "Avalanche", accountIdx: 0 });
-    expect(paths).toMatchObject([
-      {
-        addressNList: core.bip32ToAddressNList("m/44'/60'/0'/0/0"),
-        hardenedPath: core.bip32ToAddressNList("m/44'/60'/0'"),
-        relPath: [0, 0],
-        description: "Native",
-      },
-    ]);
-  });
-
   it("does not support getting the next account path", async () => {
     expect(untouchable.call(info, "ethNextAccountPath", {})).toBe(undefined);
   });
@@ -65,10 +53,18 @@ describe("NativeETHWallet", () => {
     );
   });
 
-  it("should generate another correct ethereum address at account 1", async () => {
-    expect(await wallet.ethGetAddress({ addressNList: core.bip32ToAddressNList("m/44'/60'/1'/0/0") })).toBe(
-      "0xeDe5D356020A0aA3DC3fCAf0d899b5c63d7eA4aa"
+  // Reflection. Surprise. Terror. For the future.
+  // eslint-disable-next-line jest/no-disabled-tests
+  it.skip("should generate another correct ethereum address", async () => {
+    expect(await wallet.ethGetAddress({ addressNList: core.bip32ToAddressNList("m/44'/60'/1337'/123/4") })).toBe(
+      "0x387F3031b30E2c8eB997E87a69FEA02756983b77"
     );
+  });
+
+  it("fails when generating another ethereum address", async () => {
+    await expect(
+      wallet.ethGetAddress({ addressNList: core.bip32ToAddressNList("m/44'/60'/1337'/123/4") })
+    ).rejects.toThrowError("path not supported");
   });
 
   it("should sign a legacy transaction correctly", async () => {
@@ -167,33 +163,6 @@ describe("NativeETHWallet", () => {
     ).toEqual(sig!.address);
   });
 
-  it("should sign a bytes message correctly", async () => {
-    const msg: ethers.Bytes = ethers.utils.arrayify(
-      "0xcf8746d5aa75ecfd907eb3cae0aecf7f698a8bfe1f97eb2d77d6539e8991b0ea"
-    );
-    const sig = await wallet.ethSignMessage({
-      addressNList: core.bip32ToAddressNList("m/44'/60'/0'/0/0"),
-      message: msg,
-    });
-
-    expect(sig).toMatchInlineSnapshot(`
-      Object {
-        "address": "0x73d0385F4d8E00C5e6504C6030F47BF6212736A8",
-        "signature": "0x3509a531d2e47f2b6a796d69b91568ad9ad2276f4d17399660192ef8cd6580db70dc16b6941f5ba97be926f3717a71c001778da68f9c9771375beb3f3aaa8eb31b",
-      }
-    `);
-    expect(
-      ethers.utils.computeAddress(
-        ethers.utils.recoverPublicKey(
-          ethers.utils.keccak256(
-            concat([new TextEncoder().encode(`\x19Ethereum Signed Message:\n${msg.length}`), msg])
-          ),
-          ethers.utils.splitSignature(sig!.signature)
-        )
-      )
-    ).toEqual(sig!.address);
-  });
-
   it("should verify a correctly signed message", async () => {
     expect(
       await wallet.ethVerifyMessage({
@@ -201,20 +170,6 @@ describe("NativeETHWallet", () => {
         message: "super secret message",
         signature:
           "0xd67ad52016d6fbc19fb9db81f32dd22cb67570b93b1c0e64ae30a4c2bc0b9c265c2d0f86906610d0cecac42ab90ee298a3474a5eb6d895aa7279d344f32aab191b",
-      })
-    ).toBe(true);
-  });
-
-  it("should verify a correctly signed bytes message", async () => {
-    const msg: ethers.Bytes = ethers.utils.arrayify(
-      "0xcf8746d5aa75ecfd907eb3cae0aecf7f698a8bfe1f97eb2d77d6539e8991b0ea"
-    );
-    expect(
-      await wallet.ethVerifyMessage({
-        address: "0x73d0385F4d8E00C5e6504C6030F47BF6212736A8",
-        message: msg,
-        signature:
-          "0x3509a531d2e47f2b6a796d69b91568ad9ad2276f4d17399660192ef8cd6580db70dc16b6941f5ba97be926f3717a71c001778da68f9c9771375beb3f3aaa8eb31b",
       })
     ).toBe(true);
   });
