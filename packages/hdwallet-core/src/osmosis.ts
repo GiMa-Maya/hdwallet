@@ -41,16 +41,16 @@ export namespace Osmosis {
   export interface StdTx {
     msg: Msg[];
     fee: StdFee;
-    signatures: StdSignature[];
-    memo?: string;
+    signatures: null | StdSignature[];
+    memo: string;
   }
 }
 
 export interface OsmosisTx {
   msg: Osmosis.Msg[];
   fee: Osmosis.StdFee;
-  signatures: Osmosis.StdSignature[];
-  memo?: string;
+  signatures: null | Osmosis.StdSignature[];
+  memo: string;
 }
 
 export interface OsmosisSignTx {
