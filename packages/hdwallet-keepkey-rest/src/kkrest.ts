@@ -1,7 +1,9 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as Messages from "@keepkey/device-protocol/lib/messages_pb";
 import * as Types from "@keepkey/device-protocol/lib/types_pb";
 import * as core from "@shapeshiftoss/hdwallet-core";
+import { getKeepKeySDK } from "@keepkey/keepkey-sdk";
 import _ from "lodash";
 import semver from "semver";
 
@@ -45,6 +47,19 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     this._supportsDebugLink = false;
   }
 
+  private getSdk = () => {
+    const spec = "http://localhost:1646/spec/swagger.json";
+    const config = {
+      serviceKey: process.env["SERVICE_KEY"] || "abc-1234sdfgdsf",
+      serviceName: process.env["SERVICE_NAME"] || "KeepKey SDK Demo App",
+      serviceImageUrl:
+        process.env["SERVICE_IMAGE_URL"] ||
+        "https://github.com/BitHighlander/keepkey-desktop/raw/master/electron/icon.png",
+      spec,
+    };
+    return getKeepKeySDK(config);
+  };
+
   static async create(): Promise<KeepKeyRestHDWallet> {
     return new KeepKeyRestHDWallet();
   }
@@ -82,7 +97,9 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   }
 
   public async getPublicKeys(getPublicKeys: Array<core.GetPublicKey>): Promise<Array<core.PublicKey | null>> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    const publicKeysResponse = await sdk.wallet.getPublicKeys(getPublicKeys as any);
+    return publicKeysResponse;
   }
 
   public async ping(msg: core.Ping): Promise<core.Pong> {
@@ -90,11 +107,13 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   }
 
   public async reset(msg: core.ResetDevice): Promise<void> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    await sdk.developer.reset(msg as any);
   }
 
   public async recover(r: core.RecoverDevice): Promise<void> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    await sdk.recovery.recover(r as any);
   }
 
   public async pressYes(): Promise<void> {
@@ -130,7 +149,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   }
 
   public supportsBip44Accounts(): boolean {
-    throw new Error("not implemented");
+    return true;
   }
 
   public supportsOfflineSigning(): boolean {
@@ -142,11 +161,11 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   }
 
   public async sendPin(pin: string): Promise<void> {
-    throw new Error("not implemented");
+    throw new Error('WE NEED TO IMPLEMENT SEND PIN IN THE API & SDK')
   }
 
   public async sendPassphrase(passphrase: string): Promise<void> {
-    throw new Error("not implemented");
+    throw new Error('WE NEED TO IMPLEMENT SEND PIN IN THE API & SDK')
   }
 
   public async sendCharacter(character: string): Promise<void> {
@@ -162,7 +181,8 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   }
 
   public async sendWord(word: string): Promise<void> {
-    throw new Error("Not Yet Implemented :(");
+    const sdk = await this.getSdk();
+    await sdk.recovery.sendWord({ body: word });
   }
 
   public async sendCharacterProto(character: string, _delete: boolean, _done: boolean): Promise<any> {
@@ -170,39 +190,45 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   }
 
   public async applyPolicy(p: Required<Types.PolicyType.AsObject>): Promise<void> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    await sdk.developer.applyPolicy({ body: p });
   }
 
   public async applySettings(s: Messages.ApplySettings.AsObject): Promise<void> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    await sdk.developer.applySettings({ body: s });
   }
 
   public async cancel(): Promise<void> {
-    throw new Error("not implemented");
+    throw new Error("WE NEED TO IMPLEMENT SEND PIN IN THE API & SDK");
   }
 
   public async changePin(): Promise<void> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    await sdk.recovery.changePin({ body: undefined });
   }
 
   public async clearSession(): Promise<void> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    await sdk.developer.clearSession({ body: undefined });
   }
 
   public async firmwareErase(): Promise<void> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    await sdk.developer.firmwareErase({ body: undefined });
   }
 
   public async firmwareUpload(firmware: Buffer): Promise<void> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    await sdk.developer.firmwareUpload({ body: firmware });
   }
 
   public async initialize(): Promise<Messages.Features.AsObject> {
-    throw new Error("not implemented");
+    throw new Error("WE NEED TO IMPLEMENT SEND PIN IN THE API & SDK");
   }
 
   public async getFeatures(cached = false): Promise<Messages.Features.AsObject> {
-    throw new Error("not implemented");
+    throw new Error("WE NEED TO IMPLEMENT SEND PIN IN THE API & SDK");
   }
 
   public cacheFeatures(features?: Messages.Features.AsObject): void {
@@ -222,11 +248,13 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   }
 
   public async loadDevice(msg: core.LoadDevice): Promise<void> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    await sdk.developer.loadDevice({ loadDevice: msg });
   }
 
   public async removePin(): Promise<void> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    await sdk.developer.removePin({ body: undefined });
   }
 
   public async send(events: core.Event[]): Promise<void> {
@@ -234,35 +262,39 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   }
 
   public async softReset(): Promise<void> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    await sdk.developer.softReset({ body: undefined });
   }
 
   public async wipe(): Promise<void> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    await sdk.developer.wipe({ body: undefined });
   }
 
   public async btcSupportsCoin(coin: core.Coin): Promise<boolean> {
-    throw new Error("not implemented");
+    return true;
   }
 
   public async btcSupportsScriptType(coin: core.Coin, scriptType: core.BTCInputScriptType): Promise<boolean> {
-    throw new Error("not implemented");
+    return true;
   }
 
   public async btcGetAddress(msg: core.BTCGetAddress): Promise<string> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    return sdk.wallet.btcGetAddress({ bTCGetAddress: msg });
   }
 
   public async btcSignTx(msg: core.BTCSignTxKK): Promise<core.BTCSignedTx> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    return sdk.sign.btcSignTx({ body: msg });
   }
 
   public async btcSupportsSecureTransfer(): Promise<boolean> {
-    throw new Error("not implemented");
+    return false;
   }
 
   public btcSupportsNativeShapeShift(): boolean {
-    throw new Error("not implemented");
+    return false;
   }
 
   public async ethSupportsEIP1559(): Promise<boolean> {
@@ -286,15 +318,19 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   }
 
   public async ethSignTx(msg: core.ETHSignTx): Promise<core.ETHSignedTx> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    return sdk.sign.ethSignTx({ body: msg });
   }
 
+  // TODO check if sdk supports below messages
+
   public async ethGetAddress(msg: core.ETHGetAddress): Promise<string> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    return sdk.wallet.ethGetAddress({ eTHGetAddress: msg });
   }
 
   public async ethSignMessage(msg: core.ETHSignMessage): Promise<core.ETHSignedMessage> {
-    throw new Error("not implemented");
+    throw new Error("WE NEED TO IMPLEMENT SEND PIN IN THE API & SDK");
   }
 
   public async ethSignTypedData(msg: core.ETHSignTypedData): Promise<core.ETHSignedTypedData> {
@@ -325,68 +361,82 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     throw new Error("not implemented");
   }
 
-  public rippleGetAddress(msg: core.RippleGetAddress): Promise<string> {
-    throw new Error("not implemented");
+  public async rippleGetAddress(msg: core.RippleGetAddress): Promise<string> {
+    const sdk = await this.getSdk();
+    return sdk.wallet.rippleGetAddress({ rippleGetAddress: msg });
   }
 
-  public rippleSignTx(msg: core.RippleSignTx): Promise<core.RippleSignedTx> {
-    throw new Error("not implemented");
+  public async rippleSignTx(msg: core.RippleSignTx): Promise<core.RippleSignedTx> {
+    const sdk = await this.getSdk();
+        // @ts-ignore
+    return sdk.sign.rippleSignTx({ rippleSignTx: msg});
   }
 
   public cosmosGetAccountPaths(msg: core.CosmosGetAccountPaths): Array<core.CosmosAccountPath> {
     throw new Error("not implemented");
   }
 
-  public cosmosGetAddress(msg: core.CosmosGetAddress): Promise<string> {
-    throw new Error("not implemented");
+  public async cosmosGetAddress(msg: core.CosmosGetAddress): Promise<string> {
+    const sdk = await this.getSdk();
+    return sdk.wallet.cosmosGetAddress({ cosmosGetAddress: msg });
   }
 
-  public cosmosSignTx(msg: core.CosmosSignTx): Promise<core.CosmosSignedTx> {
-    throw new Error("not implemented");
+  public async cosmosSignTx(msg: core.CosmosSignTx): Promise<core.CosmosSignedTx> {
+    const sdk = await this.getSdk();
+        // @ts-ignore
+    return sdk.sign.cosmosSignTx({ cosmosSignTx: msg });
   }
 
   public thorchainGetAccountPaths(msg: core.ThorchainGetAccountPaths): Array<core.ThorchainAccountPath> {
     throw new Error("not implemented");
   }
 
-  public thorchainGetAddress(msg: core.ThorchainGetAddress): Promise<string | null> {
-    throw new Error("not implemented");
+  public async thorchainGetAddress(msg: core.ThorchainGetAddress): Promise<string | null> {
+    const sdk = await this.getSdk();
+    return sdk.wallet.thorchainGetAddress({ thorchainGetAddress: msg });
   }
 
-  public thorchainSignTx(msg: core.ThorchainSignTx): Promise<core.ThorchainSignedTx> {
-    throw new Error("not implemented");
+  public async thorchainSignTx(msg: core.ThorchainSignTx): Promise<core.ThorchainSignedTx> {
+    const sdk = await this.getSdk();
+    // @ts-ignore
+    return sdk.sign.thorchainSignTx({ thorchainSignTx: msg });
   }
 
   public binanceGetAccountPaths(msg: core.BinanceGetAccountPaths): Array<core.BinanceAccountPath> {
     throw new Error("not implemented");
   }
 
-  public binanceGetAddress(msg: core.BinanceGetAddress): Promise<string> {
-    throw new Error("not implemented");
+  public async binanceGetAddress(msg: core.BinanceGetAddress): Promise<string> {
+    const sdk = await this.getSdk();
+    return sdk.wallet.binanceGetAddress({ binanceGetAddress: msg });
   }
 
-  public binanceSignTx(msg: core.BinanceSignTx): Promise<core.BinanceSignedTx> {
-    throw new Error("not implemented");
+  public async binanceSignTx(msg: core.BinanceSignTx): Promise<core.BinanceSignedTx> {
+    const sdk = await this.getSdk();
+    return sdk.sign.binanceSignTx({ body: msg });
   }
 
   public eosGetAccountPaths(msg: core.EosGetAccountPaths): Array<core.EosAccountPath> {
     throw new Error("not implemented");
   }
 
-  public eosGetPublicKey(msg: core.EosGetPublicKey): Promise<string> {
-    throw new Error("not implemented");
+  public async eosGetPublicKey(msg: core.EosGetPublicKey): Promise<string> {
+    const sdk = await this.getSdk();
+    return sdk.wallet.eosGetPublicKey({ eosGetPublicKey: msg });
   }
 
-  public eosSignTx(msg: core.EosToSignTx): Promise<core.EosTxSigned> {
-    throw new Error("not implemented");
+  public async eosSignTx(msg: core.EosToSignTx): Promise<core.EosTxSigned> {
+    const sdk = await this.getSdk();
+    return sdk.sign.eosSignTx({ body: msg });
   }
 
   public describePath(msg: core.DescribePath): core.PathDescription {
     throw new Error("not implemented");
   }
 
-  public disconnect(): Promise<void> {
-    throw new Error("not implemented");
+  public async disconnect(): Promise<void> {
+    const sdk = await this.getSdk();
+    sdk.developer.disconnect({ body: undefined });
   }
 
   public btcNextAccountPath(msg: core.BTCAccountPath): core.BTCAccountPath | undefined {
