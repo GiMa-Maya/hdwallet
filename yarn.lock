@@ -2418,10 +2418,10 @@
     google-protobuf "^3.7.0-rc.2"
     pbjs "^0.0.5"
 
-"@keepkey/keepkey-sdk@0.0.12":
-  version "0.0.12"
-  resolved "https://registry.yarnpkg.com/@keepkey/keepkey-sdk/-/keepkey-sdk-0.0.12.tgz#7df640026ed477c7646071dff14e2a40d634bbdf"
-  integrity sha512-VOmdGIyDe+zUcKgSsssiD+jSabfJSdNhY5o6X0oo1Qg9NrGxf1n2iiF7a2J8CGdScqEMGOXHtoX6pgaFCCsHwQ==
+"@keepkey/keepkey-sdk@0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@keepkey/keepkey-sdk/-/keepkey-sdk-0.0.17.tgz#7ee9c3ded5bad581a956e2ba9297041a2e6e4269"
+  integrity sha512-S39Eh2LqxP6z7q7xbOfCaNP7nOgVtxKo8bQ3CkHEur7qvHawSscClok0tN4I2Ik2E1ocBE9sc1CP8jtLq08hXw==
   dependencies:
     "@openapitools/openapi-generator-cli" "^2.5.2"
     "@types/node" "^13.13.14"
