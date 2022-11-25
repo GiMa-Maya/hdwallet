@@ -2441,10 +2441,10 @@
     semver "^6.3.0"
     tiny-secp256k1 "^1.1.6"
 
-"@keepkey/keepkey-sdk@0.0.23":
-  version "0.0.23"
-  resolved "https://registry.yarnpkg.com/@keepkey/keepkey-sdk/-/keepkey-sdk-0.0.23.tgz#e493556e3f8fe654e2f4589ed6c421e1986778c2"
-  integrity sha512-6fyJW6waSnB5zLGkDksHNgZhxJMdT39KHoLV1ZP53KMSqHh9cUssFz46+szbhnvoQmnX62x6Uit/eXQiLglYiw==
+"@keepkey/keepkey-sdk@0.0.25":
+  version "0.0.25"
+  resolved "https://registry.yarnpkg.com/@keepkey/keepkey-sdk/-/keepkey-sdk-0.0.25.tgz#d1769d5e16d2bead213e7995db4e58e945bd8127"
+  integrity sha512-mUc8umwjLHSEfougn+3SYeA9Wub8W28xLbgNadRPRCDQLLyelW+LOjsuQyuzaDuQOVF/spAKbfxxbVktf2jdgg==
   dependencies:
     "@openapitools/openapi-generator-cli" "^2.5.2"
     "@types/node" "^13.13.14"

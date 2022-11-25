@@ -24,10 +24,11 @@ export class KkRestAdapter {
     const wallet = new KeepKeyRestHDWallet();
     // eslint-disable-next-line no-console
     console.log("wallet: ", wallet);
-    const features = await wallet.getFeatures();
+    let features = await wallet.getFeatures();
     // eslint-disable-next-line no-console
     console.log("features: ", features);
-    const deviceID = await features.deviceID;
+    if (typeof features === "string") features = JSON.parse(features);
+    const deviceID = await features.deviceId;
     // eslint-disable-next-line no-console
     console.log("deviceID: ", deviceID);
     this.keyring.add(wallet, deviceID);
