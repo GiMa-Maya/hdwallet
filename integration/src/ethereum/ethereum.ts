@@ -1,4 +1,5 @@
 import * as core from "@keepkey/hdwallet-core";
+import * as keepkey from "@keepkey/hdwallet-keepkey";
 import * as ledger from "@keepkey/hdwallet-ledger";
 import * as portis from "@keepkey/hdwallet-portis";
 import * as trezor from "@keepkey/hdwallet-trezor";
@@ -425,38 +426,41 @@ export function ethereumTests(get: () => { wallet: core.HDWallet; info: core.HDW
     test(
       "ethSignTypedData()",
       async () => {
-        if (!wallet.isKeepKey()) return;
+        if (!keepkey.isKeepKey(wallet)) return;
 
         const res = await wallet.ethSignTypedData({
-          types: {
-            EIP712Domain: [
-              { name: "name", type: "string" },
-              { name: "version", type: "string" },
-              { name: "chainId", type: "uint256" },
-              { name: "verifyingContract", type: "address" },
-            ],
-            Permit: [
-              { name: "owner", type: "address" },
-              { name: "spender", type: "address" },
-              { name: "value", type: "uint256" },
-              { name: "nonce", type: "uint256" },
-              { name: "deadline", type: "uint256" },
-            ],
+          hashableData: {
+            types: {
+              EIP712Domain: [
+                { name: "name", type: "string" },
+                { name: "version", type: "string" },
+                { name: "chainId", type: "uint256" },
+                { name: "verifyingContract", type: "address" },
+              ],
+              Permit: [
+                { name: "owner", type: "address" },
+                { name: "spender", type: "address" },
+                { name: "value", type: "uint256" },
+                { name: "nonce", type: "uint256" },
+                { name: "deadline", type: "uint256" },
+              ],
+            },
+            domain: {
+              name: "USD Coin",
+              version: "2",
+              verifyingContract: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              chainId: 1,
+            },
+            primaryType: "Permit",
+            message: {
+              owner: "0x33b35c665496bA8E71B22373843376740401F106",
+              spender: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+              value: "4023865",
+              nonce: 0,
+              deadline: 1655431026,
+            },
           },
-          domain: {
-            name: "USD Coin",
-            version: "2",
-            verifyingContract: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-            chainId: 1,
-          },
-          primaryType: "Permit",
-          message: {
-            owner: "0x33b35c665496bA8E71B22373843376740401F106",
-            spender: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
-            value: "4023865",
-            nonce: 0,
-            deadline: 1655431026,
-          },
+          addressNList: core.bip32ToAddressNList("m/44'/60'/0'/0/0"),
         });
 
         // eslint-disable-next-line jest/no-conditional-expect

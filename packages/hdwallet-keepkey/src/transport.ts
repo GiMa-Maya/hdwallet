@@ -1,6 +1,6 @@
 import * as Messages from "@keepkey/device-protocol/lib/messages_pb";
 import * as Types from "@keepkey/device-protocol/lib/types_pb";
-import * as core from "@keepkey/hdwallet-core";
+import * as core from "@shapeshiftoss/hdwallet-core";
 import * as crypto from "crypto";
 import * as jspb from "google-protobuf";
 
@@ -97,8 +97,9 @@ export class Transport extends core.Transport {
     // for the first chunk is included in the buffer for some reason).
     // We do, however, have to count the preamble in each chunk to make the proper number
     // of chunked reads
-    let msgLenReceived = 64; // already have first buffer
-    for (let offset = first.length; msgLenReceived < msgLength; msgLenReceived += 64) {
+    // msgLenReceived initialized to 64 in loop below because we already have first buffer
+    let offset = first.length;
+    for (let msgLenReceived = 64; msgLenReceived < msgLength; msgLenReceived += 64) {
       // Drop USB "?" reportId in the first byte
       const next = (await this.delegate.readChunk(debugLink)).slice(1);
       buffer.set(next.slice(0, Math.min(next.length, buffer.length - offset)), offset);
