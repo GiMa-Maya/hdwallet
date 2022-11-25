@@ -522,9 +522,9 @@ export async function btcSignMessage(
 }
 
 export async function btcVerifyMessage(
-  wallet: core.BTCWallet,
-  transport: Transport,
-  msg: core.BTCVerifyMessage
+    wallet: this,
+    transport: Transport,
+    msg: BTCVerifyMessage
 ): Promise<boolean> {
   await ensureCoinSupport(wallet, msg.coin);
   const verify = new Messages.VerifyMessage();

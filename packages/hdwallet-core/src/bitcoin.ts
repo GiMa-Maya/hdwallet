@@ -200,7 +200,6 @@ export type BTCSignTxOutputChange = {
   scriptType: BTCOutputScriptType;
   isChange: true;
 };
-
 export type BTCSignTxOutputMemo = {
   addressType?: BTCOutputAddressType.Spend;
   amount?: "0";
