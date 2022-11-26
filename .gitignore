@@ -1,4 +1,3 @@
-*
 !/.circleci
 !/.circleci/**
 !/.codeclimate.yml
@@ -55,4 +54,7 @@
 !/tsconfig.json
 !/vercel.json
 !/yarn.lock
-!applications
+*tsconfig.tsbuildinfo*
+*dist*
+*node_modules*
+.parcel-cache/

@@ -1,0 +1,8 @@
+/*
+  Cache-Control: no-transform
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Permissions-Policy: document-domain=()
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'
