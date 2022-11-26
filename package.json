@@ -6,6 +6,7 @@
   "license": "MIT",
   "workspaces": {
     "packages": [
+      "applications/*",
       "packages/*",
       "examples/*",
       "integration"
