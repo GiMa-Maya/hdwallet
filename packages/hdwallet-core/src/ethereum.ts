@@ -1,7 +1,8 @@
 import { Bytes } from "@ethersproject/bytes";
+import { TypedData } from "eip-712";
 
 import { addressNListToBIP32, slip44ByCoin } from "./utils";
-import { BIP32Path, ExchangeType, HDWallet, HDWalletInfo, PathDescription } from "./wallet";
+import { BIP32Path, HDWallet, HDWalletInfo, PathDescription } from "./wallet";
 
 // https://github.com/MetaMask/eth-rpc-errors/blob/f917c2cfee9e6117a88be4178f2a877aff3acabe/src/classes.ts#L3-L7
 export interface SerializedEthereumRpcError {
@@ -57,10 +58,6 @@ export type ETHSignTx = {
   data: string;
   /** mainnet: 1, ropsten: 3, kovan: 42 */
   chainId: number;
-  /**
-   * Device must `ethSupportsNativeShapeShift()`
-   */
-  exchangeType?: ExchangeType;
 } & (
   | {
       /** big-endian hex, prefixed with '0x' */
@@ -107,6 +104,18 @@ export interface ETHVerifyMessage {
   message: string | Bytes;
   signature: string;
 }
+
+export type ETHSignTypedData = {
+  hashableData: TypedData;
+  addressNList: BIP32Path;
+};
+
+export type ETHSignedTypedData = {
+  signature: string;
+  address: string;
+  domainSeparatorHash: string;
+  messageHash?: string;
+};
 
 // https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain
 export interface AddEthereumChainParameter {
@@ -190,6 +199,7 @@ export interface ETHWallet extends ETHWalletInfo, HDWallet {
   ethSendTx?(msg: ETHSignTx): Promise<ETHTxHash | null>;
   ethSignMessage(msg: ETHSignMessage): Promise<ETHSignedMessage | null>;
   ethVerifyMessage(msg: ETHVerifyMessage): Promise<boolean | null>;
+  ethSignTypedData?(msg: ETHSignTypedData): Promise<ETHSignedTypedData | null>;
 }
 
 export function describeETHPath(path: BIP32Path): PathDescription {
