@@ -21,6 +21,8 @@ export class KkRestAdapter {
   }
 
   public async pairDevice(): Promise<core.HDWallet> {
+    // eslint-disable-next-line no-console
+    console.log("FOOOBAR TEST");
     const wallet = new KeepKeyRestHDWallet();
     await wallet.initialize();
     // eslint-disable-next-line no-console
