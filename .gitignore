@@ -1,4 +1,7 @@
 *
+!/applications/**
+!/applications/
+!/applications
 !/.circleci
 !/.circleci/**
 !/.codeclimate.yml
