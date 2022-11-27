@@ -22,9 +22,12 @@ type CurriedWithTransport<T extends (transport: Transport, ...args: any) => any>
 
 type LedgerNullTransportMethodMap = {
   decorateAppAPIMethods: Transport["decorateAppAPIMethods"];
-  getAppAndVersion: CurriedWithTransport<typeof getAppAndVersion>;
-  getDeviceInfo: CurriedWithTransport<typeof getDeviceInfo>;
-  openApp: CurriedWithTransport<typeof openApp>;
+    // @ts-ignore
+    getAppAndVersion: CurriedWithTransport<typeof getAppAndVersion>;
+    // @ts-ignore
+    getDeviceInfo: CurriedWithTransport<typeof getDeviceInfo>;
+    // @ts-ignore
+    openApp: CurriedWithTransport<typeof openApp>;
 };
 // The null check must be first, because null is a subtype of everything if we're not in strict mode.
 type LedgerTransportMethodMap<T extends LedgerTransportCoinType> = T extends null
@@ -84,10 +87,11 @@ export abstract class LedgerTransport extends core.Transport {
     super(keyring);
     this.transport = transport;
   }
-
-  public abstract call<T extends LedgerTransportCoinType, U extends LedgerTransportMethodName<T>>(
+  
+    public abstract call<T extends LedgerTransportCoinType, U extends LedgerTransportMethodName<T>>(
     coin: T,
     method: U,
     ...args: Parameters<LedgerTransportMethod<T, U>>
+    // @ts-ignore
   ): Promise<LedgerResponse<T, U>>;
 }

@@ -21,7 +21,7 @@
     "@keepkey/hdwallet-core": "1.38.5",
     "@keepkey/keepkey-sdk": "0.0.27",
     "@shapeshiftoss/bitcoinjs-lib": "5.2.0-shapeshift.2",
-    "@shapeshiftoss/proto-tx-builder": "^0.4.0",
+    "@keepkey/proto-tx-builder": "^0.4.0",
     "bignumber.js": "^9.0.1",
     "bnb-javascript-sdk-nobroadcast": "^2.16.14",
     "crypto-js": "^4.0.0",

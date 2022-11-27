@@ -360,6 +360,7 @@ export class LedgerHDWallet implements core.HDWallet, core.BTCWallet, core.ETHWa
    * @param appName - human-readable app name i.e. "Bitcoin Cash"
    */
   public async openApp(appName: string): Promise<void> {
+    // @ts-ignore
     const res = await this.transport.call(null, "openApp", appName);
     handleError(res, this.transport);
   }

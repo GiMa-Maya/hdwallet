@@ -76,14 +76,17 @@ export function translateCoinAndMethod<T extends LedgerTransportCoinType, U exte
           return out as LedgerTransportMethod<T, U>;
         }
         case "getAppAndVersion": {
+          // @ts-ignore
           const out: LedgerTransportMethod<null, "getAppAndVersion"> = getAppAndVersion.bind(undefined, transport);
           return out as LedgerTransportMethod<T, U>;
         }
         case "getDeviceInfo": {
+          // @ts-ignore
           const out: LedgerTransportMethod<null, "getDeviceInfo"> = getDeviceInfo.bind(undefined, transport);
           return out as LedgerTransportMethod<T, U>;
         }
         case "openApp": {
+          // @ts-ignore
           const out: LedgerTransportMethod<null, "openApp"> = openApp.bind(undefined, transport);
           return out as LedgerTransportMethod<T, U>;
         }
@@ -114,6 +117,7 @@ export class LedgerWebUsbTransport extends ledger.LedgerTransport {
     coin: T,
     method: U,
     ...args: Parameters<LedgerTransportMethod<T, U>>
+    // @ts-ignore
   ): Promise<LedgerResponse<T, U>> {
     this.emit(
       `ledger.${coin}.${method}.call`,

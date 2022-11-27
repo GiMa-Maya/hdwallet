@@ -9,7 +9,7 @@ import {
   CosmosSignTx,
   slip44ByCoin,
 } from "@keepkey/hdwallet-core";
-import { sign } from "@shapeshiftoss/proto-tx-builder";
+import { sign } from "@keepkey/proto-tx-builder";
 
 export function cosmosDescribePath(path: core.BIP32Path): core.PathDescription {
   const pathStr = core.addressNListToBIP32(path);
