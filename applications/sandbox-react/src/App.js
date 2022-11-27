@@ -1,7 +1,33 @@
 import logo from './logo.svg';
 import './App.css';
+import {
+  useEffect
+} from 'react';
+//wallet
+import * as core from "@keepkey/hdwallet-core";
+import * as keepkeyTcp from "@keepkey/hdwallet-keepkey-tcp";
+import * as keepkey from "@keepkey/hdwallet-keepkey";
+const keyring = new core.Keyring();
+const kkbridgeAdapter = keepkeyTcp.TCPKeepKeyAdapter.useKeyring(keyring);
+
+
 
 function App() {
+
+
+  let onStart = async function(){
+    try{
+      console.log("onStart")
+    }catch(e){
+      console.error(e)
+    }
+  }
+
+  // onStart()
+  useEffect(() => {
+    onStart()
+  }, [])
+
   return (
     <div className="App">
       <header className="App-header">
