@@ -13,6 +13,7 @@ export class KkRestAdapter {
   }
 
   public static useKeyring(keyring: core.Keyring) {
+    console.log("WINNING BRO!")
     return new KkRestAdapter(keyring);
   }
 
@@ -21,6 +22,7 @@ export class KkRestAdapter {
   }
 
   public async pairDevice(): Promise<core.HDWallet> {
+    console.log("WINNING BRO!!!!!!!! 2")
     const wallet = new KeepKeyRestHDWallet();
     await wallet.initialize();
     const deviceID = await wallet.getDeviceID();
