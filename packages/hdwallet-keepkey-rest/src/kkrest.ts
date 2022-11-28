@@ -405,7 +405,11 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   }
 
   public async getDeviceID(): Promise<string> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    let features = await sdk.developer.getFeatures({ getFeatures: {  } });
+    features = JSON.parse(features)
+    console.log("features: ",features)
+    return features.deviceId
   }
 
   public getVendor(): string {
@@ -582,7 +586,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
 
   public async getFeatures(cached = false): Promise<any> {
     const sdk = await this.getSdk();
-    return sdk.developer.getFeatures({ getFeatures: { cached } });
+    return JSON.parse(await sdk.developer.getFeatures({getFeatures: {cached}}));
   }
 
   public cacheFeatures(features?: Messages.Features.AsObject): void {

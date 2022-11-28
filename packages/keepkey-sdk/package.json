@@ -8,6 +8,7 @@
     "lint": "prettier --write '**/**/*.ts'",
     "create": "yarn build && yarn test",
     "build": "tsc -p .",
+    "build:watch": "tsc -p . -w",
     "prepublish": "yarn generate && yarn build",
     "generate": "openapi-generator-cli generate",
     "refresh": "rm -rf ./node_modules ./package-lock.json && yarn install"

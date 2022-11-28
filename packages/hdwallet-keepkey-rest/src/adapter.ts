@@ -24,9 +24,8 @@ export class KkRestAdapter {
   public async pairDevice(): Promise<core.HDWallet> {
     console.log("WINNING BRO!!!!!!!! 2")
     const wallet = new KeepKeyRestHDWallet();
-    // await wallet.initialize();
     console.log("wallet: ",wallet)
-    const deviceID = "TODOFIXME"
+    const deviceID = await wallet.getDeviceID();
     console.log("deviceID: ",deviceID)
     this.keyring.add(wallet, deviceID);
     this.currentDeviceID = deviceID;
