@@ -10,6 +10,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --build",
+    "build:watch": "tsc --build -w",
     "build:docs": "typedoc --out docs --target es6 --theme minimal --mode file src",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "prepublishOnly": "yarn clean && yarn build"

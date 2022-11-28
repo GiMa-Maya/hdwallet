@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as Messages from "@keepkey/device-protocol/lib/messages_pb";
 import * as Types from "@keepkey/device-protocol/lib/types_pb";
 import * as core from "@keepkey/hdwallet-core";
@@ -445,7 +443,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   public async getPublicKeys(getPublicKeys: Array<core.GetPublicKey>): Promise<Array<core.PublicKey | null>> {
     const sdk = await this.getSdk();
     const publicKeysResponse = await sdk.wallet.getPublicKeys(getPublicKeys as any);
-    return publicKeysResponse.data;
+    return publicKeysResponse;
   }
 
   public async ping(msg: core.Ping): Promise<core.Pong> {
@@ -539,7 +537,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
 
   public async sendCharacterProto(character: string, _delete: boolean, _done: boolean): Promise<any> {
     const sdk = await this.getSdk();
-    await sdk.recovery.sendCharacterProto({ sendCharacterProto: { character, _delete, _done } });
+    await sdk.recovery.sendCharacterProto({ sendCharacterProto: { character, _delete, done:_done } });
   }
 
   public async applyPolicy(p: Required<Types.PolicyType.AsObject>): Promise<void> {
@@ -640,13 +638,13 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   public async btcGetAddress(msg: core.BTCGetAddress): Promise<string> {
     const sdk = await this.getSdk();
     const addressResponse = await sdk.wallet.btcGetAddress({ bTCGetAddress: msg });
-    return addressResponse.data;
+    return addressResponse.replace(/"/g, '');
   }
 
   public async btcSignTx(msg: core.BTCSignTxKK): Promise<core.BTCSignedTx> {
     const sdk = await this.getSdk();
     const addressResponse = await sdk.sign.btcSignTx({ body: msg });
-    return addressResponse.data;
+    return addressResponse;
   }
 
   public async btcSupportsSecureTransfer(): Promise<boolean> {
@@ -680,7 +678,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   public async ethSignTx(msg: core.ETHSignTx): Promise<core.ETHSignedTx> {
     const sdk = await this.getSdk();
     const signedResponse = await sdk.sign.ethSignTx({ body: msg });
-    return signedResponse.data;
+    return signedResponse;
   }
 
   // TODO check if sdk supports below messages
@@ -688,7 +686,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   public async ethGetAddress(msg: core.ETHGetAddress): Promise<string> {
     const sdk = await this.getSdk();
     const addressResponse = await sdk.wallet.ethGetAddress({ eTHGetAddress: msg });
-    return addressResponse.data;
+    return addressResponse.replace(/"/g, '');
   }
 
   public async ethSignMessage(msg: core.ETHSignMessage): Promise<core.ETHSignedMessage> {
@@ -739,7 +737,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   public async rippleGetAddress(msg: core.RippleGetAddress): Promise<string> {
     const sdk = await this.getSdk();
     const addressResponse = await sdk.wallet.rippleGetAddress({ rippleGetAddress: msg });
-    return addressResponse.data;
+    return addressResponse.replace(/"/g, '');
   }
 
   public async rippleSignTx(msg: core.RippleSignTx): Promise<core.RippleSignedTx> {
@@ -749,7 +747,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     const rippleSignTxResponse = await sdk.sign.rippleSignTx({ rippleSignTx: msg });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    return rippleSignTxResponse.data;
+    return rippleSignTxResponse;
   }
 
   public cosmosGetAccountPaths(msg: core.CosmosGetAccountPaths): Array<core.CosmosAccountPath> {
@@ -759,7 +757,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   public async cosmosGetAddress(msg: core.CosmosGetAddress): Promise<string> {
     const sdk = await this.getSdk();
     const cosmossAddressResponse = await sdk.wallet.cosmosGetAddress({ cosmosGetAddress: msg });
-    return cosmossAddressResponse.data;
+    return cosmossAddressResponse;
   }
 
   public async cosmosSignTx(msg: core.CosmosSignTx): Promise<core.CosmosSignedTx> {
@@ -776,7 +774,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   public async thorchainGetAddress(msg: core.ThorchainGetAddress): Promise<string | null> {
     const sdk = await this.getSdk();
     const thorGetAddressResponse = await sdk.wallet.thorchainGetAddress({ thorchainGetAddress: msg });
-    return thorGetAddressResponse.data;
+    return thorGetAddressResponse;
   }
 
   public async thorchainSignTx(msg: core.ThorchainSignTx): Promise<core.ThorchainSignedTx> {
@@ -793,7 +791,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   public async binanceGetAddress(msg: core.BinanceGetAddress): Promise<string> {
     const sdk = await this.getSdk();
     const binanceGetAddressResponse = await sdk.wallet.binanceGetAddress({ binanceGetAddress: msg });
-    return binanceGetAddressResponse.data;
+    return binanceGetAddressResponse;
   }
 
   public async binanceSignTx(msg: core.BinanceSignTx): Promise<core.BinanceSignedTx> {
@@ -814,7 +812,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   public async eosGetPublicKey(msg: core.EosGetPublicKey): Promise<string> {
     const sdk = await this.getSdk();
     const eosPublicKeyResponse = await sdk.wallet.eosGetPublicKey({ eosGetPublicKey: msg });
-    return eosPublicKeyResponse.data;
+    return eosPublicKeyResponse;
   }
 
   public async eosSignTx(msg: core.EosToSignTx): Promise<core.EosTxSigned> {
