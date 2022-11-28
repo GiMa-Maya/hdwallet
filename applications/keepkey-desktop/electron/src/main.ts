@@ -23,9 +23,7 @@ log.transports.file.level = 'debug'
 Sentry.init({ dsn: process.env.SENTRY_DSN })
 
 watchForDeviceBusy()
-
 dotenvConfig()
-
 startAppListeners()
 startIpcListeners()
 startUpdaterListeners()

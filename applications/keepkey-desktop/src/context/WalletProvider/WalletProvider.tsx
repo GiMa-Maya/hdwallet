@@ -362,21 +362,15 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }): JSX
       let options: undefined | { portisAppId: string } | WalletConnectProviderConfig
       for (const walletName of Object.values(KeyManager)) {
         try {
-          console.log('Checkpoint ****** ')
           const adapter = SUPPORTED_WALLETS[walletName].adapter.useKeyring(state.keyring, options)
-          console.log('Checkpoint ****** 2')
           const wallet = await adapter.pairDevice('http://localhost:1646')
-          console.log('Checkpoint ****** 3')
+          moduleLogger.debug('Checkpoint:  pairAndConnect', wallet)
           adapters.set(walletName, adapter)
-          console.log('Checkpoint ****** 4')
           dispatch({ type: WalletActions.SET_ADAPTERS, payload: adapters })
           const { name, icon } = KeepKeyConfig
-          console.log('Checkpoint ****** 5')
           const deviceId = await wallet.getDeviceID()
-          console.log('Checkpoint ****** 6 deviceId: ', deviceId)
           // Show the label from the wallet instead of a generic name
           const label = (await wallet.getLabel()) || name
-          console.log('Checkpoint ****** 6 label: ', label)
           dispatch({
             type: WalletActions.SET_WALLET,
             payload: { wallet, name: label, icon, deviceId, meta: { label } },
@@ -388,7 +382,6 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }): JSX
            * aliases[deviceId] in the local wallet storage.
            */
           setLocalWalletTypeAndDeviceId(KeyManager.KeepKey, state.keyring.getAlias(deviceId))
-          console.log('Checkpoint ****** 7 done: ')
         } catch (e) {
           moduleLogger.error(e, 'Error initializing HDWallet adapters')
         }

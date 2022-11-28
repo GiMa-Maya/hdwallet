@@ -5,6 +5,7 @@ import { getLatestFirmwareData } from './firmwareUtils';
 import { initializeWallet } from './walletUtils'
 import { usb } from 'usb';
 import log from 'electron-log'
+import * as core from "@keepkey/hdwallet-core";
 
 // possible states
 export const UPDATE_BOOTLOADER = 'updateBootloader'
@@ -46,6 +47,29 @@ export class KKStateController {
             if(e.deviceDescriptor.idVendor !== 11044) return
             this.updateState(DISCONNECTED, {})
         })
+
+        this.keyring.onAny((name: any, values: any) => {
+            const [[deviceId, event]] = values;
+            const { from_wallet = false, message_type } = event;
+            const direction = from_wallet ? "🔑" : "💻";
+            log.info(`${deviceId} ${direction} ${message_type}`, event);
+        });
+
+        this.keyring.on(["*", "*", core.Events.CONNECT], async (deviceId) => {
+            log.info("KKStateController: event:"+core.Events.CONNECT+" ",deviceId)
+        });
+
+        this.keyring.on(["*", "*", core.Events.DISCONNECT], async (deviceId) => {
+            log.info(`option[value="${deviceId}"]`);
+        });
+
+        this.keyring.on(["*", "*", core.Events.PIN_REQUEST], async (deviceId) => {
+            log.info(`option[value="${deviceId}"]`);
+        });
+
+        this.keyring.on(["*", "*", core.Events.PASSPHRASE_REQUEST], async (deviceId) => {
+            log.info(`option[value="${deviceId}"]`);
+        });
     }
 
     private updateState = async (newState: string, newData: any) => {
