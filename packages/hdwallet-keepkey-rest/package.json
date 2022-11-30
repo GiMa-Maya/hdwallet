@@ -9,6 +9,7 @@
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
   "scripts": {
+    "build2": "yarn clean && yarn link @keepkey/keepkey-sdk && yarn && yarn build && yarn link",
     "build": "tsc --build",
     "build:docs": "typedoc --out docs --target es6 --theme minimal --mode file src",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
