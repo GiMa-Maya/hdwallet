@@ -1,10 +1,8 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as Messages from "@keepkey/device-protocol/lib/messages_pb";
 import * as Types from "@keepkey/device-protocol/lib/types_pb";
 import * as core from "@keepkey/hdwallet-core";
 import { BTCInputScriptType, describeUTXOPath } from "@keepkey/hdwallet-core";
-import { getKeepKeySDK } from "@keepkey/keepkey-sdk";
 import _ from "lodash";
 import semver from "semver";
 
@@ -197,7 +195,7 @@ function describeCosmosPath(path: core.BIP32Path): core.PathDescription {
     isPrefork: false,
   };
 }
-
+/*
 function describeThorchainPath(path: core.BIP32Path): core.PathDescription {
   const pathStr = core.addressNListToBIP32(path);
   const unknown: core.PathDescription = {
@@ -236,7 +234,7 @@ function describeThorchainPath(path: core.BIP32Path): core.PathDescription {
     isPrefork: false,
   };
 }
-
+*/
 function describeEosPath(path: core.BIP32Path): core.PathDescription {
   const pathStr = core.addressNListToBIP32(path);
   const unknown: core.PathDescription = {
@@ -385,29 +383,25 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
 
   featuresCache?: Messages.Features.AsObject;
 
-  constructor() {
+  defaultSdk: any;
+
+  queueIpcEvent: any;
+
+  constructor(sdk: any, queueIpcEvent: any) {
+    this.queueIpcEvent = queueIpcEvent;
+    this.defaultSdk = sdk;
     this._supportsDebugLink = false;
   }
 
-  private getSdk = () => {
-    const spec = "http://localhost:1646/spec/swagger.json";
-    const config = {
-      serviceKey: process.env["SERVICE_KEY"] || "abc-1234sdfgdsf",
-      serviceName: process.env["SERVICE_NAME"] || "KeepKey SDK Demo App",
-      serviceImageUrl:
-        process.env["SERVICE_IMAGE_URL"] ||
-        "https://github.com/BitHighlander/keepkey-desktop/raw/master/electron/icon.png",
-      spec,
-    };
-    return getKeepKeySDK(config);
-  };
-
-  static async create(): Promise<KeepKeyRestHDWallet> {
-    return new KeepKeyRestHDWallet();
+  private async getSdk() {
+    return this.defaultSdk;
   }
 
   public async getDeviceID(): Promise<string> {
-    throw new Error("not implemented");
+    const sdk = await this.getSdk();
+    let features = await sdk.developer.getFeatures({ getFeatures: {} });
+    features = JSON.parse(features);
+    return features.deviceId;
   }
 
   public getVendor(): string {
@@ -444,11 +438,11 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
 
   public async getPublicKeys(getPublicKeys: Array<core.GetPublicKey>): Promise<Array<core.PublicKey | null>> {
     const sdk = await this.getSdk();
-    const publicKeysResponse = await sdk.wallet.getPublicKeys(getPublicKeys as any);
-    return publicKeysResponse.data;
+    const publicKeysResponse = await sdk.wallet.getPublicKeys({ getPublicKey: getPublicKeys });
+    return publicKeysResponse;
   }
 
-  public async ping(msg: core.Ping): Promise<core.Pong> {
+  public async ping(_msg: core.Ping): Promise<core.Pong> {
     throw new Error("not implemented");
   }
 
@@ -470,7 +464,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     return this.press(false);
   }
 
-  public async press(isYes: boolean): Promise<void> {
+  public async press(_isYes: boolean): Promise<void> {
     throw new Error("not implemented");
   }
 
@@ -490,7 +484,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     return false;
   }
 
-  public hasNativeShapeShift(srcCoin: core.Coin, dstCoin: core.Coin): boolean {
+  public hasNativeShapeShift(_srcCoin: core.Coin, _dstCoin: core.Coin): boolean {
     return true;
   }
 
@@ -507,10 +501,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   }
 
   public async sendPin(pin: string): Promise<void> {
-    const sdk = await this.getSdk();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return await sdk.recovery.sendPin({ pin });
+    this.queueIpcEvent("sendPin", pin);
   }
 
   public async sendPassphrase(passphrase: string): Promise<void> {
@@ -539,7 +530,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
 
   public async sendCharacterProto(character: string, _delete: boolean, _done: boolean): Promise<any> {
     const sdk = await this.getSdk();
-    await sdk.recovery.sendCharacterProto({ sendCharacterProto: { character, _delete, _done } });
+    await sdk.recovery.sendCharacterProto({ sendCharacterProto: { character, _delete, done: _done } });
   }
 
   public async applyPolicy(p: Required<Types.PolicyType.AsObject>): Promise<void> {
@@ -579,19 +570,19 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
 
   public async initialize(): Promise<void> {
     const sdk = await this.getSdk();
-    await sdk.developer.initialize({ body: null });
+    await sdk.developer.initialize({ body: {} });
   }
 
   public async getFeatures(cached = false): Promise<any> {
     const sdk = await this.getSdk();
-    return sdk.developer.getFeatures({ getFeatures: { cached } });
+    return JSON.parse(await sdk.developer.getFeatures({ getFeatures: { cached } }));
   }
 
   public cacheFeatures(features?: Messages.Features.AsObject): void {
     this.featuresCache = features;
   }
 
-  public async getEntropy(size: number): Promise<Uint8Array> {
+  public async getEntropy(_size: number): Promise<Uint8Array> {
     throw new Error("not implemented");
   }
 
@@ -599,7 +590,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     throw new Error("not implemented");
   }
 
-  public async getCoinTable(start = 0, end: number = start + 10): Promise<Types.CoinType.AsObject[]> {
+  public async getCoinTable(start = 0, _end: number = start + 10): Promise<Types.CoinType.AsObject[]> {
     throw new Error("not implemented");
   }
 
@@ -615,7 +606,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     return await sdk.developer.removePin({});
   }
 
-  public async send(events: core.Event[]): Promise<void> {
+  public async send(_events: core.Event[]): Promise<void> {
     throw new Error("not implemented");
   }
 
@@ -629,24 +620,24 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     await sdk.developer.wipe({ body: undefined });
   }
 
-  public async btcSupportsCoin(coin: core.Coin): Promise<boolean> {
+  public async btcSupportsCoin(_coin: core.Coin): Promise<boolean> {
     return true;
   }
 
-  public async btcSupportsScriptType(coin: core.Coin, scriptType: core.BTCInputScriptType): Promise<boolean> {
+  public async btcSupportsScriptType(_coin: core.Coin, _scriptType: core.BTCInputScriptType): Promise<boolean> {
     return true;
   }
 
   public async btcGetAddress(msg: core.BTCGetAddress): Promise<string> {
     const sdk = await this.getSdk();
     const addressResponse = await sdk.wallet.btcGetAddress({ bTCGetAddress: msg });
-    return addressResponse.data;
+    return addressResponse.replace(/"/g, "");
   }
 
   public async btcSignTx(msg: core.BTCSignTxKK): Promise<core.BTCSignedTx> {
     const sdk = await this.getSdk();
     const addressResponse = await sdk.sign.btcSignTx({ body: msg });
-    return addressResponse.data;
+    return addressResponse;
   }
 
   public async btcSupportsSecureTransfer(): Promise<boolean> {
@@ -661,26 +652,26 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     return semver.gte(await this.getFirmwareVersion(), "v7.2.1");
   }
 
-  public async btcSignMessage(msg: core.BTCSignMessage): Promise<core.BTCSignedMessage> {
+  public async btcSignMessage(_msg: core.BTCSignMessage): Promise<core.BTCSignedMessage> {
     throw new Error("not implemented");
   }
 
-  public async btcVerifyMessage(msg: core.BTCVerifyMessage): Promise<boolean> {
+  public async btcVerifyMessage(_msg: core.BTCVerifyMessage): Promise<boolean> {
     throw new Error("not implemented");
   }
 
-  public btcGetAccountPaths(msg: core.BTCGetAccountPaths): Array<core.BTCAccountPath> {
+  public btcGetAccountPaths(_msg: core.BTCGetAccountPaths): Array<core.BTCAccountPath> {
     throw new Error("not implemented");
   }
 
-  public btcIsSameAccount(msg: Array<core.BTCAccountPath>): boolean {
+  public btcIsSameAccount(_msg: Array<core.BTCAccountPath>): boolean {
     throw new Error("not implemented");
   }
 
   public async ethSignTx(msg: core.ETHSignTx): Promise<core.ETHSignedTx> {
     const sdk = await this.getSdk();
     const signedResponse = await sdk.sign.ethSignTx({ body: msg });
-    return signedResponse.data;
+    return signedResponse;
   }
 
   // TODO check if sdk supports below messages
@@ -688,22 +679,22 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   public async ethGetAddress(msg: core.ETHGetAddress): Promise<string> {
     const sdk = await this.getSdk();
     const addressResponse = await sdk.wallet.ethGetAddress({ eTHGetAddress: msg });
-    return addressResponse.data;
+    return addressResponse.replace(/"/g, "");
   }
 
-  public async ethSignMessage(msg: core.ETHSignMessage): Promise<core.ETHSignedMessage> {
-    throw new Error("WE NEED TO IMPLEMENT SEND PIN IN THE API & SDK");
-  }
-
-  public async ethSignTypedData(msg: core.ETHSignTypedData): Promise<core.ETHSignedTypedData> {
+  public async ethSignMessage(_msg: core.ETHSignMessage): Promise<core.ETHSignedMessage> {
     throw new Error("not implemented");
   }
 
-  public async ethVerifyMessage(msg: core.ETHVerifyMessage): Promise<boolean> {
+  public async ethSignTypedData(_msg: core.ETHSignTypedData): Promise<core.ETHSignedTypedData> {
     throw new Error("not implemented");
   }
 
-  public async ethSupportsNetwork(chain_id: number): Promise<boolean> {
+  public async ethVerifyMessage(_msg: core.ETHVerifyMessage): Promise<boolean> {
+    throw new Error("not implemented");
+  }
+
+  public async ethSupportsNetwork(_chain_id: number): Promise<boolean> {
     return true;
   }
 
@@ -739,7 +730,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   public async rippleGetAddress(msg: core.RippleGetAddress): Promise<string> {
     const sdk = await this.getSdk();
     const addressResponse = await sdk.wallet.rippleGetAddress({ rippleGetAddress: msg });
-    return addressResponse.data;
+    return addressResponse.replace(/"/g, "");
   }
 
   public async rippleSignTx(msg: core.RippleSignTx): Promise<core.RippleSignedTx> {
@@ -749,17 +740,17 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     const rippleSignTxResponse = await sdk.sign.rippleSignTx({ rippleSignTx: msg });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    return rippleSignTxResponse.data;
+    return rippleSignTxResponse;
   }
 
-  public cosmosGetAccountPaths(msg: core.CosmosGetAccountPaths): Array<core.CosmosAccountPath> {
+  public cosmosGetAccountPaths(_msg: core.CosmosGetAccountPaths): Array<core.CosmosAccountPath> {
     throw new Error("not implemented");
   }
 
   public async cosmosGetAddress(msg: core.CosmosGetAddress): Promise<string> {
     const sdk = await this.getSdk();
     const cosmossAddressResponse = await sdk.wallet.cosmosGetAddress({ cosmosGetAddress: msg });
-    return cosmossAddressResponse.data;
+    return cosmossAddressResponse;
   }
 
   public async cosmosSignTx(msg: core.CosmosSignTx): Promise<core.CosmosSignedTx> {
@@ -769,14 +760,14 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     return sdk.sign.cosmosSignTx({ cosmosSignTx: msg });
   }
 
-  public thorchainGetAccountPaths(msg: core.ThorchainGetAccountPaths): Array<core.ThorchainAccountPath> {
+  public thorchainGetAccountPaths(_msg: core.ThorchainGetAccountPaths): Array<core.ThorchainAccountPath> {
     throw new Error("not implemented");
   }
 
   public async thorchainGetAddress(msg: core.ThorchainGetAddress): Promise<string | null> {
     const sdk = await this.getSdk();
     const thorGetAddressResponse = await sdk.wallet.thorchainGetAddress({ thorchainGetAddress: msg });
-    return thorGetAddressResponse.data;
+    return thorGetAddressResponse;
   }
 
   public async thorchainSignTx(msg: core.ThorchainSignTx): Promise<core.ThorchainSignedTx> {
@@ -786,14 +777,14 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     return sdk.sign.thorchainSignTx({ thorchainSignTx: msg });
   }
 
-  public binanceGetAccountPaths(msg: core.BinanceGetAccountPaths): Array<core.BinanceAccountPath> {
+  public binanceGetAccountPaths(_msg: core.BinanceGetAccountPaths): Array<core.BinanceAccountPath> {
     throw new Error("not implemented");
   }
 
   public async binanceGetAddress(msg: core.BinanceGetAddress): Promise<string> {
     const sdk = await this.getSdk();
     const binanceGetAddressResponse = await sdk.wallet.binanceGetAddress({ binanceGetAddress: msg });
-    return binanceGetAddressResponse.data;
+    return binanceGetAddressResponse;
   }
 
   public async binanceSignTx(msg: core.BinanceSignTx): Promise<core.BinanceSignedTx> {
@@ -814,7 +805,7 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   public async eosGetPublicKey(msg: core.EosGetPublicKey): Promise<string> {
     const sdk = await this.getSdk();
     const eosPublicKeyResponse = await sdk.wallet.eosGetPublicKey({ eosGetPublicKey: msg });
-    return eosPublicKeyResponse.data;
+    return eosPublicKeyResponse;
   }
 
   public async eosSignTx(msg: core.EosToSignTx): Promise<core.EosTxSigned> {
@@ -846,27 +837,27 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
     sdk.developer.disconnect({ body: undefined });
   }
 
-  public btcNextAccountPath(msg: core.BTCAccountPath): core.BTCAccountPath | undefined {
+  public btcNextAccountPath(_msg: core.BTCAccountPath): core.BTCAccountPath | undefined {
     throw new Error("not implemented");
   }
 
-  public ethNextAccountPath(msg: core.ETHAccountPath): core.ETHAccountPath | undefined {
+  public ethNextAccountPath(_msg: core.ETHAccountPath): core.ETHAccountPath | undefined {
     throw new Error("not implemented");
   }
 
-  public eosNextAccountPath(msg: core.EosAccountPath): core.EosAccountPath | undefined {
+  public eosNextAccountPath(_msg: core.EosAccountPath): core.EosAccountPath | undefined {
     throw new Error("not implemented");
   }
 
-  public cosmosNextAccountPath(msg: core.CosmosAccountPath): core.CosmosAccountPath | undefined {
+  public cosmosNextAccountPath(_msg: core.CosmosAccountPath): core.CosmosAccountPath | undefined {
     throw new Error("not implemented");
   }
 
-  public rippleNextAccountPath(msg: core.RippleAccountPath): core.RippleAccountPath | undefined {
+  public rippleNextAccountPath(_msg: core.RippleAccountPath): core.RippleAccountPath | undefined {
     throw new Error("not implemented");
   }
 
-  public binanceNextAccountPath(msg: core.BinanceAccountPath): core.BinanceAccountPath | undefined {
+  public binanceNextAccountPath(_msg: core.BinanceAccountPath): core.BinanceAccountPath | undefined {
     throw new Error("not implemented");
   }
 }
@@ -875,6 +866,6 @@ export function info(): any {
   throw new Error("not implemented");
 }
 
-export function create(): KeepKeyRestHDWallet {
-  return new KeepKeyRestHDWallet();
+export function create(sdk: any, queueIpcEvent: any): KeepKeyRestHDWallet {
+  return new KeepKeyRestHDWallet(sdk, queueIpcEvent);
 }

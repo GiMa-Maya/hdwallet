@@ -20,9 +20,9 @@ export class KkRestAdapter {
     return Object.keys(this.keyring.wallets).length;
   }
 
-  public async pairDevice(): Promise<core.HDWallet> {
-    const wallet = new KeepKeyRestHDWallet();
-    await wallet.initialize();
+  public async pairDevice(sdk: any, queueIpcEvent: any): Promise<core.HDWallet> {
+    const wallet = new KeepKeyRestHDWallet(sdk, queueIpcEvent);
+    // await wallet.initialize();
     const deviceID = await wallet.getDeviceID();
     this.keyring.add(wallet, deviceID);
     this.currentDeviceID = deviceID;
