@@ -387,6 +387,8 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
 
   queueIpcEvent: any;
 
+  ethAddressCache: any = {};
+
   constructor(sdk: any, queueIpcEvent: any) {
     this.queueIpcEvent = queueIpcEvent;
     this.defaultSdk = sdk;
@@ -677,9 +679,13 @@ export class KeepKeyRestHDWallet implements core.HDWallet, core.BTCWallet, core.
   // TODO check if sdk supports below messages
 
   public async ethGetAddress(msg: core.ETHGetAddress): Promise<string> {
+    const key = JSON.stringify(msg.addressNList);
+    const cachedAddress = this.ethAddressCache[key];
+    if (cachedAddress) return cachedAddress;
     const sdk = await this.getSdk();
-    const addressResponse = await sdk.wallet.ethGetAddress({ eTHGetAddress: msg });
-    return addressResponse.replace(/"/g, "");
+    const addressResponse = (await sdk.wallet.ethGetAddress({ eTHGetAddress: msg })).replace(/"/g, "");
+    this.ethAddressCache[key] = addressResponse;
+    return addressResponse;
   }
 
   public async ethSignMessage(_msg: core.ETHSignMessage): Promise<core.ETHSignedMessage> {
