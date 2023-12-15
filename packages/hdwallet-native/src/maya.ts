@@ -9,7 +9,7 @@ import * as Isolation from "./crypto/isolation";
 import { NativeHDWalletBase } from "./native";
 import * as util from "./util";
 
-const THOR_CHAIN = "maya-mainnet-v1";
+const MAYA_CHAIN = "maya-mainnet-v1";
 
 const protoTxBuilder = PLazy.from(() => import("@shapeshiftoss/proto-tx-builder"));
 
@@ -70,7 +70,7 @@ export function MixinNativeMayaWallet<TBase extends core.Constructor<NativeHDWal
       const message = CryptoJS.SHA256(CryptoJS.enc.Hex.parse(publicKey));
       const hash = CryptoJS.RIPEMD160(message as any).toString();
       const address = Buffer.from(hash, `hex`);
-      return this.mayaBech32ify(address, `thor`);
+      return this.mayaBech32ify(address, `maya`);
     }
 
     async mayaGetAddress(msg: core.MayaGetAddress): Promise<string | null> {
@@ -85,15 +85,15 @@ export function MixinNativeMayaWallet<TBase extends core.Constructor<NativeHDWal
       return this.needsMnemonic(!!this.#masterKey, async () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const keyPair = await util.getKeyPair(this.#masterKey!, msg.addressNList, "maya");
-        const adapter = await Isolation.Adapters.CosmosDirect.create(keyPair.node, "thor");
+        const adapter = await Isolation.Adapters.CosmosDirect.create(keyPair.node, "maya");
 
         const signerData: SignerData = {
           sequence: Number(msg.sequence),
           accountNumber: Number(msg.account_number),
-          chainId: THOR_CHAIN,
+          chainId: MAYA_CHAIN,
         };
 
-        return (await protoTxBuilder).sign(adapter.address, msg.tx as StdTx, adapter, signerData, "thor");
+        return (await protoTxBuilder).sign(adapter.address, msg.tx as StdTx, adapter, signerData, "maya");
       });
     }
   };
