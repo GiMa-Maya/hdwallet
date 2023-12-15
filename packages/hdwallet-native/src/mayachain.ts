@@ -9,28 +9,28 @@ import * as Isolation from "./crypto/isolation";
 import { NativeHDWalletBase } from "./native";
 import * as util from "./util";
 
-const MAYA_CHAIN = "maya-mainnet-v1";
+const MAYA_CHAIN = "mayachain-mainnet-v1";
 
 const protoTxBuilder = PLazy.from(() => import("@shapeshiftoss/proto-tx-builder"));
 
-export function MixinNativeMayaWalletInfo<TBase extends core.Constructor<core.HDWalletInfo>>(Base: TBase) {
+export function MixinNativeMayachainWalletInfo<TBase extends core.Constructor<core.HDWalletInfo>>(Base: TBase) {
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  return class MixinNativeMayaWalletInfo extends Base implements core.MayaWalletInfo {
-    readonly _supportsMayaInfo = true;
-    async mayaSupportsNetwork(): Promise<boolean> {
+  return class MixinNativeMayachainWalletInfo extends Base implements core.MayachainWalletInfo {
+    readonly _supportsMayachainInfo = true;
+    async mayachainSupportsNetwork(): Promise<boolean> {
       return true;
     }
 
-    async mayaSupportsSecureTransfer(): Promise<boolean> {
+    async mayachainSupportsSecureTransfer(): Promise<boolean> {
       return false;
     }
 
-    mayaSupportsNativeShapeShift(): boolean {
+    mayachainSupportsNativeShapeShift(): boolean {
       return false;
     }
 
-    mayaGetAccountPaths(msg: core.MayaGetAccountPaths): Array<core.MayaAccountPath> {
-      const slip44 = core.slip44ByCoin("Maya");
+    mayachainGetAccountPaths(msg: core.MayachainGetAccountPaths): Array<core.MayachainAccountPath> {
+      const slip44 = core.slip44ByCoin("Mayachain");
       return [
         {
           addressNList: [0x80000000 + 44, 0x80000000 + slip44, 0x80000000 + msg.accountIdx, 0, 0],
@@ -39,52 +39,52 @@ export function MixinNativeMayaWalletInfo<TBase extends core.Constructor<core.HD
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    mayaNextAccountPath(msg: core.MayaAccountPath): core.MayaAccountPath | undefined {
+    mayachainNextAccountPath(msg: core.MayachainAccountPath): core.MayachainAccountPath | undefined {
       // Only support one account for now (like portis).
       return undefined;
     }
   };
 }
 
-export function MixinNativeMayaWallet<TBase extends core.Constructor<NativeHDWalletBase>>(Base: TBase) {
+export function MixinNativeMayachainWallet<TBase extends core.Constructor<NativeHDWalletBase>>(Base: TBase) {
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  return class MixinNativeMayaWallet extends Base {
-    readonly _supportsMaya = true;
+  return class MixinNativeMayachainWallet extends Base {
+    readonly _supportsMayachain = true;
 
     #masterKey: Isolation.Core.BIP32.Node | undefined;
 
-    async mayaInitializeWallet(masterKey: Isolation.Core.BIP32.Node): Promise<void> {
+    async mayachainInitializeWallet(masterKey: Isolation.Core.BIP32.Node): Promise<void> {
       this.#masterKey = masterKey;
     }
 
-    mayaWipe(): void {
+    mayachainWipe(): void {
       this.#masterKey = undefined;
     }
 
-    mayaBech32ify(address: ArrayLike<number>, prefix: string): string {
+    mayachainBech32ify(address: ArrayLike<number>, prefix: string): string {
       const words = bech32.toWords(address);
       return bech32.encode(prefix, words);
     }
 
-    createMayaAddress(publicKey: string) {
+    createMayachainAddress(publicKey: string) {
       const message = CryptoJS.SHA256(CryptoJS.enc.Hex.parse(publicKey));
       const hash = CryptoJS.RIPEMD160(message as any).toString();
       const address = Buffer.from(hash, `hex`);
-      return this.mayaBech32ify(address, `maya`);
+      return this.mayachainBech32ify(address, `maya`);
     }
 
-    async mayaGetAddress(msg: core.MayaGetAddress): Promise<string | null> {
+    async mayachainGetAddress(msg: core.MayachainGetAddress): Promise<string | null> {
       return this.needsMnemonic(!!this.#masterKey, async () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const keyPair = await util.getKeyPair(this.#masterKey!, msg.addressNList, "maya");
-        return this.createMayaAddress(keyPair.publicKey.toString("hex"));
+        const keyPair = await util.getKeyPair(this.#masterKey!, msg.addressNList, "mayachain");
+        return this.createMayachainAddress(keyPair.publicKey.toString("hex"));
       });
     }
 
-    async mayaSignTx(msg: core.MayaSignTx): Promise<core.MayaSignedTx | null> {
+    async mayachainSignTx(msg: core.MayachainSignTx): Promise<core.MayachainSignedTx | null> {
       return this.needsMnemonic(!!this.#masterKey, async () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const keyPair = await util.getKeyPair(this.#masterKey!, msg.addressNList, "maya");
+        const keyPair = await util.getKeyPair(this.#masterKey!, msg.addressNList, "mayachain");
         const adapter = await Isolation.Adapters.CosmosDirect.create(keyPair.node, "maya");
 
         const signerData: SignerData = {
